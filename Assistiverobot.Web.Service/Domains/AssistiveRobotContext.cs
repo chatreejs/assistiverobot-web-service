@@ -21,11 +21,6 @@ namespace AssistiveRobot.Web.Service.Domains
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=localhost;Database=AssistiveRobot;Trusted_Connection=False;User ID=sa;Password=P@ssw0rd");
-            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
