@@ -1,4 +1,4 @@
-using Assistiverobot.Web.Service.Constants;
+using AssistiveRobot.Web.Service.Constants;
 
 namespace AssistiveRobot.Web.Service.Models.Response
 {
