@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Assistiverobot.Web.Service.Domains;
+using AssistiveRobot.Web.Service.Domains;
+using AssistiveRobot.Web.Service.Models.Params;
 using Microsoft.EntityFrameworkCore;
 
-namespace Assistiverobot.Web.Service.Repositories
+namespace AssistiveRobot.Web.Service.Repositories
 {
     public class JobRepository : IDataRepository<Job>
     {
@@ -20,6 +22,15 @@ namespace Assistiverobot.Web.Service.Repositories
                 .Include(j => j.Goal)
                 .ToList();
         }
+
+        // public IEnumerable<Job> GetAllByFilter(JobFilter filter)
+        // {
+        //     return _context.Job
+        //         .Include(j => j.Goal)
+        //         .Where(j => j.Status.Equals(filter.Status ?? String.Empty))
+        //         .Take(filter.Limit)
+        //         .ToList();
+        // }
 
         public Job Get(long id)
         {

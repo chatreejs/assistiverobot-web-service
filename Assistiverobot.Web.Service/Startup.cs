@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Assistiverobot.Web.Service.Domains;
-using Assistiverobot.Web.Service.Repositories;
+using AssistiveRobot.Web.Service.Domains;
+using AssistiveRobot.Web.Service.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -15,7 +15,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Serialization;
 
-namespace Assistiverobot.Web.Service
+namespace AssistiveRobot.Web.Service
 {
     public class Startup
     {

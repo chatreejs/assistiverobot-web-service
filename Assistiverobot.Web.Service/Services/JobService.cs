@@ -1,4 +1,4 @@
-namespace Assistiverobot.Web.Service.Services
+namespace AssistiveRobot.Web.Service.Services
 {
     public class JobService
     {

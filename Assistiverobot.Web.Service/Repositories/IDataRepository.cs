@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Assistiverobot.Web.Service.Repositories
+namespace AssistiveRobot.Web.Service.Repositories
 {
     public interface IDataRepository<TEntity>
     {

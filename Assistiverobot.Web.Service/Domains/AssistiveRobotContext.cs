@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Assistiverobot.Web.Service.Domains
+namespace AssistiveRobot.Web.Service.Domains
 {
     public partial class AssistiveRobotContext : DbContext
     {

@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Assistiverobot.Web.Service
+namespace AssistiveRobot.Web.Service
 {
     public class Program
     {

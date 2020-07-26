@@ -1,7 +1,7 @@
 using System;
 using Newtonsoft.Json;
 
-namespace Assistiverobot.Web.Service.Models.Response
+namespace AssistiveRobot.Web.Service.Models.Response
 {
     public class JobResponse
     {

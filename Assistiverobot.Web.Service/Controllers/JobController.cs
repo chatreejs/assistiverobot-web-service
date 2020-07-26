@@ -2,14 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using Assistiverobot.Web.Service.Constants;
-using Assistiverobot.Web.Service.Domains;
-using Assistiverobot.Web.Service.Models.Response;
-using Assistiverobot.Web.Service.Repositories;
+using AssistiveRobot.Web.Service.Constants;
+using AssistiveRobot.Web.Service.Domains;
+using AssistiveRobot.Web.Service.Models.Params;
+using AssistiveRobot.Web.Service.Models.Response;
+using AssistiveRobot.Web.Service.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Assistiverobot.Web.Service.Controllers
+namespace AssistiveRobot.Web.Service.Controllers
 {
     [ApiController]
     [Route("api/v1/jobs")]
@@ -23,7 +24,7 @@ namespace Assistiverobot.Web.Service.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAllJobs()
+        public IActionResult GetAllJobs([FromQuery] JobFilter filter)
         {
             try
             {
@@ -43,13 +44,12 @@ namespace Assistiverobot.Web.Service.Controllers
                         UpdatedDate = job.UpdatedDate
                     })
                     .ToList();
-                
                 return StatusCode(StatusCodes.Status200OK, ResultResponse.GetResultSuccess(jobResponse));
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return StatusCode(StatusCodes.Status500InternalServerError, null);
+                return StatusCode(StatusCodes.Status500InternalServerError, ResultResponse.GetResultInternalError());
             }
         }
 
