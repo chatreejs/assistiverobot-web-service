@@ -11,7 +11,7 @@ namespace AssistiveRobot.Web.Service.Controllers
         {
             var resultResponse = new ResultResponse()
             {
-                Message = StatusMessage.MessageSuccess,
+                Message = StatusMessages.MessageSuccess,
                 Result = null,
             };
             return StatusCode(StatusCodes.Status200OK, resultResponse);
@@ -21,7 +21,7 @@ namespace AssistiveRobot.Web.Service.Controllers
         {
             var resultResponse = new ResultResponse()
             {
-                Message = StatusMessage.MessageSuccess,
+                Message = StatusMessages.MessageSuccess,
                 Result = result,
             };
             return StatusCode(StatusCodes.Status200OK, resultResponse);
@@ -31,10 +31,30 @@ namespace AssistiveRobot.Web.Service.Controllers
         {
             var resultResponse = new ResultResponse()
             {
-                Message = StatusMessage.MessageSuccess,
+                Message = StatusMessages.MessageSuccess,
                 Result = result,
             };
             return StatusCode(statusCode, resultResponse);
+        }
+
+        public IActionResult GetResultNotFound()
+        {
+            var resultResponse = new ResultResponse()
+            {
+                Message = StatusMessages.MessageNotFound,
+                Result = null
+            };
+            return StatusCode(StatusCodes.Status404NotFound, resultResponse);
+        }
+
+        public IActionResult GetResultInternalError()
+        {
+            var resultResponse = new ResultResponse()
+            {
+                Message = StatusMessages.MessageInternalError,
+                Result = null
+            };
+            return StatusCode(StatusCodes.Status500InternalServerError, resultResponse);
         }
     }
 }

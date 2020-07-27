@@ -29,7 +29,7 @@ namespace AssistiveRobot.Web.Service.Controllers
                 var enumerable = jobs as Job[] ?? jobs.ToArray();
                 if (!enumerable.Any())
                 {
-                    return StatusCode(StatusCodes.Status204NoContent);
+                    return GetResultSuccess(null, StatusCodes.Status204NoContent);
                 }
 
                 var jobResponse = (from job in jobs
@@ -60,7 +60,7 @@ namespace AssistiveRobot.Web.Service.Controllers
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return StatusCode(StatusCodes.Status500InternalServerError, null);
+                return GetResultInternalError();
             }
         }
 
@@ -72,8 +72,7 @@ namespace AssistiveRobot.Web.Service.Controllers
                 var job = _jobRepository.Get(id);
                 if (job == null)
                 {
-                    // return StatusCode(StatusCodes.Status404NotFound, null);
-                    return GetResultSuccess(null, StatusCodes.Status404NotFound);
+                    return GetResultNotFound();
                 }
 
                 var goalResponse = job.Goal.Select(goal => new GoalResponse()
@@ -98,13 +97,12 @@ namespace AssistiveRobot.Web.Service.Controllers
                     CreatedDate = job.CreatedDate,
                     UpdatedDate = job.UpdatedDate
                 };
-                // return StatusCode(StatusCodes.Status200OK, jobResponse);
                 return GetResultSuccess(jobResponse);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return StatusCode(StatusCodes.Status500InternalServerError, null);
+                return GetResultInternalError();
             }
         }
 
