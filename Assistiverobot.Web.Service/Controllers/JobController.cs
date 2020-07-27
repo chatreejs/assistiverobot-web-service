@@ -1,8 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using AssistiveRobot.Web.Service.Constants;
 using AssistiveRobot.Web.Service.Domains;
 using AssistiveRobot.Web.Service.Models.Params;
 using AssistiveRobot.Web.Service.Models.Response;
@@ -14,7 +11,7 @@ namespace AssistiveRobot.Web.Service.Controllers
 {
     [ApiController]
     [Route("api/v1/jobs")]
-    public class JobController : ControllerBase
+    public class JobController : BaseController
     {
         private readonly JobRepository _jobRepository;
 
@@ -35,21 +32,35 @@ namespace AssistiveRobot.Web.Service.Controllers
                     return StatusCode(StatusCodes.Status204NoContent);
                 }
 
-                var jobResponse = enumerable
-                    .Select(job => new JobResponse()
+                var jobResponse = (from job in jobs
+                    let goalResponse = job.Goal.Select(goal => new GoalResponse()
+                        {
+                            GoalId = goal.GoalId,
+                            JobId = goal.JobId,
+                            PositionX = goal.PositionX,
+                            PositionY = goal.PositionY,
+                            PositionZ = goal.PositionZ,
+                            OrientationX = goal.OrientationX,
+                            OrientationY = goal.OrientationY,
+                            OrientationZ = goal.OrientationZ,
+                            OrientationW = goal.OrientationW,
+                            Status = goal.Status
+                        })
+                        .ToList()
+                    select new JobResponse()
                     {
                         JobId = job.JobId,
+                        Goal = goalResponse,
                         Status = job.Status,
                         CreatedDate = job.CreatedDate,
                         UpdatedDate = job.UpdatedDate
-                    })
-                    .ToList();
-                return StatusCode(StatusCodes.Status200OK, ResultResponse.GetResultSuccess(jobResponse));
+                    }).ToList();
+                return GetResultSuccess(jobResponse);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return StatusCode(StatusCodes.Status500InternalServerError, ResultResponse.GetResultInternalError());
+                return StatusCode(StatusCodes.Status500InternalServerError, null);
             }
         }
 
@@ -61,17 +72,34 @@ namespace AssistiveRobot.Web.Service.Controllers
                 var job = _jobRepository.Get(id);
                 if (job == null)
                 {
-                    return StatusCode(StatusCodes.Status404NotFound, null);
+                    // return StatusCode(StatusCodes.Status404NotFound, null);
+                    return GetResultSuccess(null, StatusCodes.Status404NotFound);
                 }
 
+                var goalResponse = job.Goal.Select(goal => new GoalResponse()
+                    {
+                        GoalId = goal.GoalId,
+                        JobId = goal.JobId,
+                        PositionX = goal.PositionX,
+                        PositionY = goal.PositionY,
+                        PositionZ = goal.PositionZ,
+                        OrientationX = goal.OrientationX,
+                        OrientationY = goal.OrientationY,
+                        OrientationZ = goal.OrientationZ,
+                        OrientationW = goal.OrientationW,
+                        Status = goal.Status
+                    })
+                    .ToList();
                 var jobResponse = new JobResponse()
                 {
                     JobId = job.JobId,
+                    Goal = goalResponse,
                     Status = job.Status,
                     CreatedDate = job.CreatedDate,
                     UpdatedDate = job.UpdatedDate
                 };
-                return StatusCode(StatusCodes.Status200OK, jobResponse);
+                // return StatusCode(StatusCodes.Status200OK, jobResponse);
+                return GetResultSuccess(jobResponse);
             }
             catch (Exception e)
             {
@@ -83,13 +111,13 @@ namespace AssistiveRobot.Web.Service.Controllers
         [HttpPost]
         public IActionResult CreateJob([FromBody] object job)
         {
-            return StatusCode(StatusCodes.Status200OK, job);
+            return GetResultSuccess();
         }
 
         [HttpPatch("{id}")]
         public IActionResult UpdateJob(long id, [FromBody] object job)
         {
-            return StatusCode(StatusCodes.Status200OK, job);
+            return GetResultSuccess();
         }
     }
 }
