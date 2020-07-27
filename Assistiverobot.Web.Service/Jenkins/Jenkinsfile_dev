@@ -1,0 +1,26 @@
+pipeline {
+      agent any
+      stages {
+          stage('Checkout') {
+              steps {
+                  git branch: 'dev',
+                      url: 'https://gitlab.com/assistiverobot/assistiverobot.web.service.git'
+                  echo 'Checkout complete'
+              }
+          }
+          stage('Build') {
+              steps {
+                  bat 'dotnet build AssistiveRobot.Web.Service.sln'
+              }
+          }
+          stage('Deploy') {
+              steps {
+                  bat 'appcmd stop apppool /apppool.name:\"Toktak Web App Dev\"'
+                  bat label: '', script: '''cd ./AssistiveRobot.Web.Service
+                                         dotnet restore
+                                         dotnet publish --configuration Release --output D:\\Toktak-Web-Service\\develop'''
+                  bat 'appcmd start apppool /apppool.name:\"Toktak Web Service Dev\"'
+              }
+          }
+      }
+}
