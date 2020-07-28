@@ -21,11 +21,11 @@ namespace AssistiveRobot.Web.Service.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAllJobs([FromQuery] JobFilter filter)
+        public IActionResult GetAllJobs([FromQuery] JobFilter jobFilter)
         {
             try
             {
-                var jobs = _jobRepository.GetAll();
+                var jobs = _jobRepository.GetAllByCondition(jobFilter);
                 var enumerable = jobs as Job[] ?? jobs.ToArray();
                 if (!enumerable.Any())
                 {

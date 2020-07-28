@@ -23,14 +23,22 @@ namespace AssistiveRobot.Web.Service.Repositories
                 .ToList();
         }
 
-        // public IEnumerable<Job> GetAllByFilter(JobFilter filter)
-        // {
-        //     return _context.Job
-        //         .Include(j => j.Goal)
-        //         .Where(j => j.Status.Equals(filter.Status ?? String.Empty))
-        //         .Take(filter.Limit)
-        //         .ToList();
-        // }
+        public IEnumerable<Job> GetAllByCondition(JobFilter jobFilter)
+        {
+            if (!string.IsNullOrEmpty(jobFilter.Status))
+            {
+                return _context.Job
+                    .Include(j => j.Goal)
+                    .Where(j => j.Status.Equals(jobFilter.Status))
+                    .Take(jobFilter.Limit)
+                    .ToList();
+            }
+
+            return _context.Job
+                .Include(j => j.Goal)
+                .Take(jobFilter.Limit)
+                .ToList();
+        }
 
         public Job Get(long id)
         {
