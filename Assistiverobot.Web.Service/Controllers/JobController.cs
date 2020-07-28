@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using AssistiveRobot.Web.Service.Domains;
 using AssistiveRobot.Web.Service.Models.Params;
@@ -26,14 +27,18 @@ namespace AssistiveRobot.Web.Service.Controllers
             try
             {
                 var jobs = _jobRepository.GetAllByCondition(jobFilter);
-                var enumerable = jobs as Job[] ?? jobs.ToArray();
-                if (!enumerable.Any())
+                if (!jobs.Any())
                 {
                     return GetResultSuccess(null, StatusCodes.Status204NoContent);
                 }
 
-                var jobResponse = (from job in jobs
-                    let goalResponse = job.Goal.Select(goal => new GoalResponse()
+                var jobResponse = new List<JobResponse>();
+                foreach (var job in jobs)
+                {
+                    var goalResponse = new List<GoalResponse>();
+                    foreach (var goal in job.Goal)
+                    {
+                        goalResponse.Add(new GoalResponse()
                         {
                             GoalId = goal.GoalId,
                             JobId = goal.JobId,
@@ -45,16 +50,17 @@ namespace AssistiveRobot.Web.Service.Controllers
                             OrientationZ = goal.OrientationZ,
                             OrientationW = goal.OrientationW,
                             Status = goal.Status
-                        })
-                        .ToList()
-                    select new JobResponse()
+                        });
+                    }
+                    jobResponse.Add(new JobResponse()
                     {
                         JobId = job.JobId,
                         Goal = goalResponse,
                         Status = job.Status,
                         CreatedDate = job.CreatedDate,
                         UpdatedDate = job.UpdatedDate
-                    }).ToList();
+                    });
+                }
                 return GetResultSuccess(jobResponse);
             }
             catch (Exception e)
