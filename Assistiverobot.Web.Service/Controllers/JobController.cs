@@ -39,20 +39,28 @@ namespace AssistiveRobot.Web.Service.Controllers
                     var goalResponse = new List<GoalResponse>();
                     foreach (var goal in job.Goal)
                     {
+                        var position = new Position()
+                        {
+                            X = goal.Location.PositionX,
+                            Y = goal.Location.PositionY,
+                            Z = goal.Location.PositionZ,
+                        };
+                        var orientation = new Orientation()
+                        {
+                            X = goal.Location.OrientationX,
+                            Y = goal.Location.OrientationY,
+                            Z = goal.Location.OrientationZ,
+                            W = goal.Location.OrientationW,
+                        };
                         goalResponse.Add(new GoalResponse()
                         {
                             GoalId = goal.GoalId,
-                            PositionX = goal.Location.PositionX,
-                            PositionY = goal.Location.PositionY,
-                            PositionZ = goal.Location.PositionZ,
-                            OrientationX = goal.Location.OrientationX,
-                            OrientationY = goal.Location.OrientationY,
-                            OrientationZ = goal.Location.OrientationZ,
-                            OrientationW = goal.Location.OrientationW,
+                            Position = position,
+                            Orientation = orientation,
                             Status = goal.Status
                         });
                     }
-                
+
                     jobResponse.Add(new JobResponse()
                     {
                         JobId = job.JobId,
@@ -62,7 +70,7 @@ namespace AssistiveRobot.Web.Service.Controllers
                         UpdatedDate = job.UpdatedDate
                     });
                 }
-                
+
                 return GetResultSuccess(jobResponse);
             }
             catch (Exception e)
@@ -83,19 +91,31 @@ namespace AssistiveRobot.Web.Service.Controllers
                     return GetResultNotFound();
                 }
 
-                var goalResponse = job.Goal.Select(goal => new GoalResponse()
+                var goalResponse = new List<GoalResponse>();
+                foreach (var goal in job.Goal)
+                {
+                    var position = new Position()
+                    {
+                        X = goal.Location.PositionX,
+                        Y = goal.Location.PositionY,
+                        Z = goal.Location.PositionZ,
+                    };
+                    var orientation = new Orientation()
+                    {
+                        X = goal.Location.OrientationX,
+                        Y = goal.Location.OrientationY,
+                        Z = goal.Location.OrientationZ,
+                        W = goal.Location.OrientationW,
+                    };
+                    goalResponse.Add(new GoalResponse()
                     {
                         GoalId = goal.GoalId,
-                        PositionX = goal.Location.PositionX,
-                        PositionY = goal.Location.PositionY,
-                        PositionZ = goal.Location.PositionZ,
-                        OrientationX = goal.Location.OrientationX,
-                        OrientationY = goal.Location.OrientationY,
-                        OrientationZ = goal.Location.OrientationZ,
-                        OrientationW = goal.Location.OrientationW,
+                        Position = position,
+                        Orientation = orientation,
                         Status = goal.Status
-                    })
-                    .ToList();
+                    });
+                }
+
                 var jobResponse = new JobResponse()
                 {
                     JobId = job.JobId,
@@ -113,6 +133,7 @@ namespace AssistiveRobot.Web.Service.Controllers
             }
         }
 
+        // TODO: แก้เป็นรับ startLocationId, destinationLocationId
         [HttpPost]
         public IActionResult CreateJob([FromBody] JobRequest jobRequest)
         {
