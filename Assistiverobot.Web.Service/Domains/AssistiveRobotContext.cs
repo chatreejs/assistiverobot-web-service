@@ -35,13 +35,13 @@ namespace AssistiveRobot.Web.Service.Domains
                     .WithMany(p => p.Goal)
                     .HasForeignKey(d => d.JobId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Goal__JobId__3A81B327");
+                    .HasConstraintName("FK__Goal__JobId__4222D4EF");
 
                 entity.HasOne(d => d.Location)
                     .WithMany(p => p.Goal)
                     .HasForeignKey(d => d.LocationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Goal__LocationId__3B75D760");
+                    .HasConstraintName("FK__Goal__LocationId__4316F928");
             });
 
             modelBuilder.Entity<Job>(entity =>
@@ -57,6 +57,10 @@ namespace AssistiveRobot.Web.Service.Domains
 
             modelBuilder.Entity<Location>(entity =>
             {
+                entity.Property(e => e.Name)
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.OrientationW).HasColumnType("decimal(10, 7)");
 
                 entity.Property(e => e.OrientationX).HasColumnType("decimal(10, 7)");

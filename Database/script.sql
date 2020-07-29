@@ -18,6 +18,7 @@ go
 create table Location
 (
     LocationId   bigint identity (1, 1) not null,
+    Name         varchar(255)           null,
     PositionX    decimal(10, 7)         null,
     PositionY    decimal(10, 7)         null,
     PositionZ    decimal(10, 7)         null,

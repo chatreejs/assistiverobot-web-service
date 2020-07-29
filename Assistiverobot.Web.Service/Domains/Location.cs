@@ -11,6 +11,7 @@ namespace AssistiveRobot.Web.Service.Domains
         }
 
         public long LocationId { get; set; }
+        public string Name { get; set; }
         public decimal? PositionX { get; set; }
         public decimal? PositionY { get; set; }
         public decimal? PositionZ { get; set; }
