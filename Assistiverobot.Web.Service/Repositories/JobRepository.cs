@@ -28,6 +28,7 @@ namespace AssistiveRobot.Web.Service.Repositories
             {
                 return _context.Job
                     .Include(j => j.Goal)
+                    .Include("Goal.Location")
                     .Where(j => j.Status.Equals(jobFilter.Status))
                     .Take(jobFilter.Limit)
                     .ToList();
@@ -35,6 +36,7 @@ namespace AssistiveRobot.Web.Service.Repositories
 
             return _context.Job
                 .Include(j => j.Goal)
+                .Include("Goal.Location")
                 .Take(jobFilter.Limit)
                 .ToList();
         }
@@ -43,6 +45,7 @@ namespace AssistiveRobot.Web.Service.Repositories
         {
             var job = _context.Job
                 .Include(j => j.Goal)
+                .Include("Goal.Location")
                 .SingleOrDefault(j => j.JobId == id);
 
             return job;

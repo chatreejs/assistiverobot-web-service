@@ -42,18 +42,17 @@ namespace AssistiveRobot.Web.Service.Controllers
                         goalResponse.Add(new GoalResponse()
                         {
                             GoalId = goal.GoalId,
-                            JobId = goal.JobId,
-                            PositionX = goal.PositionX,
-                            PositionY = goal.PositionY,
-                            PositionZ = goal.PositionZ,
-                            OrientationX = goal.OrientationX,
-                            OrientationY = goal.OrientationY,
-                            OrientationZ = goal.OrientationZ,
-                            OrientationW = goal.OrientationW,
+                            PositionX = goal.Location.PositionX,
+                            PositionY = goal.Location.PositionY,
+                            PositionZ = goal.Location.PositionZ,
+                            OrientationX = goal.Location.OrientationX,
+                            OrientationY = goal.Location.OrientationY,
+                            OrientationZ = goal.Location.OrientationZ,
+                            OrientationW = goal.Location.OrientationW,
                             Status = goal.Status
                         });
                     }
-
+                
                     jobResponse.Add(new JobResponse()
                     {
                         JobId = job.JobId,
@@ -63,7 +62,7 @@ namespace AssistiveRobot.Web.Service.Controllers
                         UpdatedDate = job.UpdatedDate
                     });
                 }
-
+                
                 return GetResultSuccess(jobResponse);
             }
             catch (Exception e)
@@ -87,14 +86,13 @@ namespace AssistiveRobot.Web.Service.Controllers
                 var goalResponse = job.Goal.Select(goal => new GoalResponse()
                     {
                         GoalId = goal.GoalId,
-                        JobId = goal.JobId,
-                        PositionX = goal.PositionX,
-                        PositionY = goal.PositionY,
-                        PositionZ = goal.PositionZ,
-                        OrientationX = goal.OrientationX,
-                        OrientationY = goal.OrientationY,
-                        OrientationZ = goal.OrientationZ,
-                        OrientationW = goal.OrientationW,
+                        PositionX = goal.Location.PositionX,
+                        PositionY = goal.Location.PositionY,
+                        PositionZ = goal.Location.PositionZ,
+                        OrientationX = goal.Location.OrientationX,
+                        OrientationY = goal.Location.OrientationY,
+                        OrientationZ = goal.Location.OrientationZ,
+                        OrientationW = goal.Location.OrientationW,
                         Status = goal.Status
                     })
                     .ToList();

@@ -1,8 +1,16 @@
-namespace AssistiveRobot.Web.Service.Models.Response
+﻿using System;
+using System.Collections.Generic;
+
+namespace AssistiveRobot.Web.Service.Domains
 {
-    public class GoalResponse
+    public partial class Location
     {
-        public long GoalId { get; set; }
+        public Location()
+        {
+            Goal = new HashSet<Goal>();
+        }
+
+        public long LocationId { get; set; }
         public decimal? PositionX { get; set; }
         public decimal? PositionY { get; set; }
         public decimal? PositionZ { get; set; }
@@ -10,6 +18,7 @@ namespace AssistiveRobot.Web.Service.Models.Response
         public decimal? OrientationY { get; set; }
         public decimal? OrientationZ { get; set; }
         public decimal? OrientationW { get; set; }
-        public string Status { get; set; }
+
+        public virtual ICollection<Goal> Goal { get; set; }
     }
 }
