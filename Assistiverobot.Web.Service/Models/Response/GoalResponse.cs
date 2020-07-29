@@ -3,7 +3,6 @@ namespace AssistiveRobot.Web.Service.Models.Response
     public class GoalResponse
     {
         public long GoalId { get; set; }
-        public long? JobId { get; set; }
         public decimal? PositionX { get; set; }
         public decimal? PositionY { get; set; }
         public decimal? PositionZ { get; set; }
