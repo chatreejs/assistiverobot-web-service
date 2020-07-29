@@ -1,8 +1,8 @@
-create database AssitveRobot
+create database AssistiveRobot
 
 go
 
-use AssitveRobot
+use AssistiveRobot
 
 create table Job
 (
