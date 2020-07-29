@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AssistiveRobot.Web.Service.Domains;
 using AssistiveRobot.Web.Service.Models.Params;
+using AssistiveRobot.Web.Service.Models.Request;
 using AssistiveRobot.Web.Service.Models.Response;
 using AssistiveRobot.Web.Service.Repositories;
 using Microsoft.AspNetCore.Http;
@@ -52,6 +53,7 @@ namespace AssistiveRobot.Web.Service.Controllers
                             Status = goal.Status
                         });
                     }
+
                     jobResponse.Add(new JobResponse()
                     {
                         JobId = job.JobId,
@@ -61,6 +63,7 @@ namespace AssistiveRobot.Web.Service.Controllers
                         UpdatedDate = job.UpdatedDate
                     });
                 }
+
                 return GetResultSuccess(jobResponse);
             }
             catch (Exception e)
@@ -113,9 +116,21 @@ namespace AssistiveRobot.Web.Service.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateJob([FromBody] object job)
+        public IActionResult CreateJob([FromBody] JobRequest jobRequest)
         {
-            return GetResultSuccess();
+            if (!ModelState.IsValid)
+            {
+                return GetResultBadRequest();
+            }
+
+            var job = new Job()
+            {
+                Status = "pending",
+                CreatedDate = DateTime.Now
+            };
+            _jobRepository.Add(job);
+            Console.WriteLine(job.JobId);
+            return GetResultCreated();
         }
 
         [HttpPatch("{id}")]

@@ -36,7 +36,22 @@ namespace AssistiveRobot.Web.Service.Controllers
             };
             return StatusCode(statusCode, resultResponse);
         }
+        
+        public IActionResult GetResultCreated()
+        {
+            return GetResultSuccess(null, StatusCodes.Status201Created);
+        }
 
+        public IActionResult GetResultBadRequest()
+        {
+            var resultResponse = new ResultResponse()
+            {
+                Message = StatusMessages.MessageInvalidRequestParams,
+                Result = null
+            };
+            return StatusCode(StatusCodes.Status400BadRequest, resultResponse);
+        }
+        
         public IActionResult GetResultNotFound()
         {
             var resultResponse = new ResultResponse()
