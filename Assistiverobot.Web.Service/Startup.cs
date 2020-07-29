@@ -32,6 +32,7 @@ namespace AssistiveRobot.Web.Service
             services.AddDbContext<AssistiveRobotContext>(opts => opts.UseSqlServer(
                 Configuration["ConnectionString:AssistiveRobotDB"]));
             services.AddScoped<JobRepository>();
+            services.AddScoped<GoalRepository>();
             services.AddScoped<LocationRepository>();
 
             services.AddControllers()

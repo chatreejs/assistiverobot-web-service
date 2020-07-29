@@ -16,10 +16,12 @@ namespace AssistiveRobot.Web.Service.Controllers
     public class JobController : BaseController
     {
         private readonly JobRepository _jobRepository;
+        private readonly GoalRepository _goalRepository;
 
-        public JobController(JobRepository jobRepository)
+        public JobController(JobRepository jobRepository, GoalRepository goalRepository)
         {
             _jobRepository = jobRepository;
+            _goalRepository = goalRepository;
         }
 
         [HttpGet]
@@ -135,21 +137,43 @@ namespace AssistiveRobot.Web.Service.Controllers
 
         // TODO: แก้เป็นรับ startLocationId, destinationLocationId
         [HttpPost]
-        public IActionResult CreateJob([FromBody] JobRequest jobRequest)
+        public IActionResult CreateJob([FromForm] JobRequest jobRequest)
         {
             if (!ModelState.IsValid)
             {
                 return GetResultBadRequest();
             }
 
-            var job = new Job()
+            try
             {
-                Status = "pending",
-                CreatedDate = DateTime.Now
-            };
-            _jobRepository.Add(job);
-            Console.WriteLine(job.JobId);
-            return GetResultCreated();
+                var job = new Job()
+                {
+                    Status = "pending",
+                    CreatedDate = DateTime.Now
+                };
+                _jobRepository.Add(job);
+
+                var startGoal = new Goal()
+                {
+                    JobId = job.JobId,
+                    LocationId = jobRequest.Start,
+                    Status = "pending"
+                };
+                var destinationGoal = new Goal()
+                {
+                    JobId = job.JobId,
+                    LocationId = jobRequest.Destination,
+                    Status = "pending"
+                };
+                _goalRepository.Add(startGoal);
+                _goalRepository.Add(destinationGoal);
+                return GetResultCreated();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return GetResultInternalError();
+            }
         }
 
         [HttpPatch("{id}")]
