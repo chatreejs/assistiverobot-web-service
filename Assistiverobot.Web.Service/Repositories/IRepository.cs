@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace AssistiveRobot.Web.Service.Repositories
 {
-    public interface IDataRepository<TEntity>
+    public interface IRepository<TEntity>
     {
         IEnumerable<TEntity> GetAll();
         TEntity Get(long id);
