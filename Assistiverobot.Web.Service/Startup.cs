@@ -26,11 +26,28 @@ namespace AssistiveRobot.Web.Service
 
         public IConfiguration Configuration { get; }
 
+        private readonly string _allowSpecificOrigins = "_ToktakWebServiceAllowSpecificOrigins";
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options => 
+            {
+                options.AddPolicy(_allowSpecificOrigins, builder => 
+                {
+                    Configuration.GetSection("WebServiceSettings:CorsPolicy").GetChildren().ToList().ForEach(corsPolicy =>
+                    {
+                        builder
+                            //.AllowAnyOrigin()
+                            .WithOrigins(corsPolicy.Value)
+                            .AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .SetIsOriginAllowedToAllowWildcardSubdomains();
+                    });
+                });
+            });
             services.AddDbContext<AssistiveRobotContext>(opts => opts.UseSqlServer(
-                Configuration["ConnectionString:AssistiveRobotDB"]));
+                Configuration["WebServiceSettings:AssistiveRobotDB"]));
             services.AddScoped<JobRepository>();
             services.AddScoped<GoalRepository>();
             services.AddScoped<LocationRepository>();
@@ -55,9 +72,11 @@ namespace AssistiveRobot.Web.Service
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors(_allowSpecificOrigins);
 
             app.UseAuthorization();
 
