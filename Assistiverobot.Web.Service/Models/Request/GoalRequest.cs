@@ -4,7 +4,6 @@ namespace AssistiveRobot.Web.Service.Models.Request
 {
     public class GoalRequest
     {
-        public Position Position = new Position();
-        public Orientation Orientation = new Orientation();
+        public string Status { get; set; } = null;
     }
 }

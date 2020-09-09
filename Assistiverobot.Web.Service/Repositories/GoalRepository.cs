@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using AssistiveRobot.Web.Service.Domains;
 
 namespace AssistiveRobot.Web.Service.Repositories
@@ -19,7 +20,10 @@ namespace AssistiveRobot.Web.Service.Repositories
 
         public Goal Get(long id)
         {
-            throw new System.NotImplementedException();
+            var goal = _context.Goal
+                .SingleOrDefault(g => g.GoalId == id);
+
+            return goal;
         }
 
         public void Add(Goal entity)
@@ -30,7 +34,12 @@ namespace AssistiveRobot.Web.Service.Repositories
 
         public void Update(Goal entityToUpdate, Goal entity)
         {
-            throw new System.NotImplementedException();
+            entityToUpdate = _context.Goal
+                .Single(g => g.GoalId == entityToUpdate.GoalId);
+
+            entityToUpdate.Status = entity.Status;
+
+            _context.SaveChanges();
         }
 
         public void Delete(Goal entity)

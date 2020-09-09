@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace AssistiveRobot.Web.Service.Domains
+﻿namespace AssistiveRobot.Web.Service.Domains
 {
     public partial class Goal
     {
