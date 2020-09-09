@@ -25,7 +25,8 @@ namespace AssistiveRobot.Web.Service.Repositories
 
         public void Add(Location entity)
         {
-            throw new System.NotImplementedException();
+            _context.Location.Add(entity);
+            _context.SaveChanges();
         }
 
         public void Update(Location entityToUpdate, Location entity)
