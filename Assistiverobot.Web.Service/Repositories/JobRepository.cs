@@ -59,7 +59,13 @@ namespace AssistiveRobot.Web.Service.Repositories
 
         public void Update(Job entityToUpdate, Job entity)
         {
-            throw new System.NotImplementedException();
+            entityToUpdate = _context.Job
+                .Single(j => j.JobId == entityToUpdate.JobId);
+
+            entityToUpdate.Status = entity.Status;
+            entityToUpdate.UpdatedDate = entity.UpdatedDate;
+
+            _context.SaveChanges();
         }
 
         public void Delete(Job entity)

@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+using System;
 
 namespace AssistiveRobot.Web.Service.Models.Request
 {
     public class JobRequest
     {
-        public long Start { get; set; }
-        public long Destination { get; set; }
+        public string Status { get; set; } = null;
     }
 }

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using AssistiveRobot.Web.Service.Constants;
 using AssistiveRobot.Web.Service.Domains;
 using AssistiveRobot.Web.Service.Models.Params;
 using AssistiveRobot.Web.Service.Models.Request;
@@ -135,11 +137,10 @@ namespace AssistiveRobot.Web.Service.Controllers
             }
         }
 
-        // TODO: แก้เป็นรับ startLocationId, destinationLocationId
         [HttpPost]
-        public IActionResult CreateJob([FromForm] JobRequest jobRequest)
+        public IActionResult CreateJob([FromBody] JobLocationRequest jobRequest)
         {
-            if (!ModelState.IsValid)
+            if (jobRequest.Start == 0 || jobRequest.Destination == 0)
             {
                 return GetResultBadRequest();
             }
@@ -148,7 +149,7 @@ namespace AssistiveRobot.Web.Service.Controllers
             {
                 var job = new Job()
                 {
-                    Status = "pending",
+                    Status = JobStatus.StatusPending,
                     CreatedDate = DateTime.Now
                 };
                 _jobRepository.Add(job);
@@ -177,9 +178,39 @@ namespace AssistiveRobot.Web.Service.Controllers
         }
 
         [HttpPatch("{id}")]
-        public IActionResult UpdateJob(long id, [FromBody] object job)
+        public IActionResult UpdateJob(long id, [FromBody] JobRequest jobRequest)
         {
-            return GetResultSuccess();
+            if (jobRequest.Status == null)
+            {
+                return GetResultBadRequest();
+            }
+
+            var hasField = typeof(JobStatus).GetFields(BindingFlags.Public | BindingFlags.Static)
+                .Select(x => x.GetRawConstantValue().ToString()).Contains(jobRequest.Status);
+
+            if (!hasField)
+            {
+                return GetResultBadRequest();
+            }
+
+            try
+            {
+                var job = _jobRepository.Get(id);
+                var jobUpdated = new Job()
+                {
+                    JobId = job.JobId,
+                    Status = jobRequest.Status,
+                    CreatedDate = job.CreatedDate,
+                    UpdatedDate = DateTime.Now
+                };
+                _jobRepository.Update(job, jobUpdated);
+                return GetResultSuccess();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return GetResultInternalError();
+            }
         }
     }
 }
