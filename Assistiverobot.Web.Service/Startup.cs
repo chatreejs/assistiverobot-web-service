@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Assistiverobot.Web.Service.Domains;
-using Assistiverobot.Web.Service.Repositories;
+using AssistiveRobot.Web.Service.Domains;
+using AssistiveRobot.Web.Service.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -15,7 +15,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Serialization;
 
-namespace Assistiverobot.Web.Service
+namespace AssistiveRobot.Web.Service
 {
     public class Startup
     {
@@ -26,12 +26,31 @@ namespace Assistiverobot.Web.Service
 
         public IConfiguration Configuration { get; }
 
+        private readonly string _allowSpecificOrigins = "_ToktakWebServiceAllowSpecificOrigins";
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options => 
+            {
+                options.AddPolicy(_allowSpecificOrigins, builder => 
+                {
+                    Configuration.GetSection("WebServiceSettings:CorsPolicy").GetChildren().ToList().ForEach(corsPolicy =>
+                    {
+                        builder
+                            //.AllowAnyOrigin()
+                            .WithOrigins(corsPolicy.Value)
+                            .AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .SetIsOriginAllowedToAllowWildcardSubdomains();
+                    });
+                });
+            });
             services.AddDbContext<AssistiveRobotContext>(opts => opts.UseSqlServer(
-                Configuration["ConnectionString:AssistiveRobotDB"]));
+                Configuration["WebServiceSettings:AssistiveRobotDB"]));
             services.AddScoped<JobRepository>();
+            services.AddScoped<GoalRepository>();
+            services.AddScoped<LocationRepository>();
 
             services.AddControllers()
                 .AddNewtonsoftJson(
@@ -53,9 +72,11 @@ namespace Assistiverobot.Web.Service
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors(_allowSpecificOrigins);
 
             app.UseAuthorization();
 

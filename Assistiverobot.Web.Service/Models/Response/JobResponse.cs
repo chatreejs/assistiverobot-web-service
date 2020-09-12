@@ -1,11 +1,12 @@
 using System;
-using Newtonsoft.Json;
+using System.Collections.Generic;
 
-namespace Assistiverobot.Web.Service.Models.Response
+namespace AssistiveRobot.Web.Service.Models.Response
 {
     public class JobResponse
     {
         public long JobId { get; set; }
+        public ICollection<GoalResponse> Goal { get; set; }
         public string Status { get; set; }
         public DateTime? CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }

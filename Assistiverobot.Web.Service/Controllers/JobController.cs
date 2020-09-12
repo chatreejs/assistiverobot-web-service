@@ -1,55 +1,86 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using Assistiverobot.Web.Service.Constants;
-using Assistiverobot.Web.Service.Domains;
-using Assistiverobot.Web.Service.Models.Response;
-using Assistiverobot.Web.Service.Repositories;
+using System.Reflection;
+using AssistiveRobot.Web.Service.Constants;
+using AssistiveRobot.Web.Service.Domains;
+using AssistiveRobot.Web.Service.Models.Params;
+using AssistiveRobot.Web.Service.Models.Request;
+using AssistiveRobot.Web.Service.Models.Response;
+using AssistiveRobot.Web.Service.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Assistiverobot.Web.Service.Controllers
+namespace AssistiveRobot.Web.Service.Controllers
 {
     [ApiController]
     [Route("api/v1/jobs")]
-    public class JobController : ControllerBase
+    public class JobController : BaseController
     {
         private readonly JobRepository _jobRepository;
+        private readonly GoalRepository _goalRepository;
 
-        public JobController(JobRepository jobRepository)
+        public JobController(JobRepository jobRepository, GoalRepository goalRepository)
         {
             _jobRepository = jobRepository;
+            _goalRepository = goalRepository;
         }
 
         [HttpGet]
-        public IActionResult GetAllJobs()
+        public IActionResult GetAllJobs([FromQuery] JobFilter jobFilter)
         {
             try
             {
-                var jobs = _jobRepository.GetAll();
-                var enumerable = jobs as Job[] ?? jobs.ToArray();
-                if (!enumerable.Any())
+                var jobs = _jobRepository.GetAllByCondition(jobFilter);
+                if (!jobs.Any())
                 {
-                    return StatusCode(StatusCodes.Status204NoContent);
+                    return GetResultSuccess(null, StatusCodes.Status204NoContent);
                 }
 
-                var jobResponse = enumerable
-                    .Select(job => new JobResponse()
+                var jobResponse = new List<JobResponse>();
+                foreach (var job in jobs)
+                {
+                    var goalResponse = new List<GoalResponse>();
+                    foreach (var goal in job.Goal)
+                    {
+                        var position = new Position()
+                        {
+                            X = goal.Location.PositionX,
+                            Y = goal.Location.PositionY,
+                            Z = goal.Location.PositionZ,
+                        };
+                        var orientation = new Orientation()
+                        {
+                            X = goal.Location.OrientationX,
+                            Y = goal.Location.OrientationY,
+                            Z = goal.Location.OrientationZ,
+                            W = goal.Location.OrientationW,
+                        };
+                        goalResponse.Add(new GoalResponse()
+                        {
+                            GoalId = goal.GoalId,
+                            Position = position,
+                            Orientation = orientation,
+                            Status = goal.Status
+                        });
+                    }
+
+                    jobResponse.Add(new JobResponse()
                     {
                         JobId = job.JobId,
+                        Goal = goalResponse,
                         Status = job.Status,
                         CreatedDate = job.CreatedDate,
                         UpdatedDate = job.UpdatedDate
-                    })
-                    .ToList();
-                
-                return StatusCode(StatusCodes.Status200OK, ResultResponse.GetResultSuccess(jobResponse));
+                    });
+                }
+
+                return GetResultSuccess(jobResponse);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return StatusCode(StatusCodes.Status500InternalServerError, null);
+                return GetResultInternalError();
             }
         }
 
@@ -61,35 +92,125 @@ namespace Assistiverobot.Web.Service.Controllers
                 var job = _jobRepository.Get(id);
                 if (job == null)
                 {
-                    return StatusCode(StatusCodes.Status404NotFound, null);
+                    return GetResultNotFound();
+                }
+
+                var goalResponse = new List<GoalResponse>();
+                foreach (var goal in job.Goal)
+                {
+                    var position = new Position()
+                    {
+                        X = goal.Location.PositionX,
+                        Y = goal.Location.PositionY,
+                        Z = goal.Location.PositionZ,
+                    };
+                    var orientation = new Orientation()
+                    {
+                        X = goal.Location.OrientationX,
+                        Y = goal.Location.OrientationY,
+                        Z = goal.Location.OrientationZ,
+                        W = goal.Location.OrientationW,
+                    };
+                    goalResponse.Add(new GoalResponse()
+                    {
+                        GoalId = goal.GoalId,
+                        Position = position,
+                        Orientation = orientation,
+                        Status = goal.Status
+                    });
                 }
 
                 var jobResponse = new JobResponse()
                 {
                     JobId = job.JobId,
+                    Goal = goalResponse,
                     Status = job.Status,
                     CreatedDate = job.CreatedDate,
                     UpdatedDate = job.UpdatedDate
                 };
-                return StatusCode(StatusCodes.Status200OK, jobResponse);
+                return GetResultSuccess(jobResponse);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return StatusCode(StatusCodes.Status500InternalServerError, null);
+                return GetResultInternalError();
             }
         }
 
         [HttpPost]
-        public IActionResult CreateJob([FromBody] object job)
+        public IActionResult CreateJob([FromBody] JobLocationRequest jobRequest)
         {
-            return StatusCode(StatusCodes.Status200OK, job);
+            if (jobRequest.Start == 0 || jobRequest.Destination == 0)
+            {
+                return GetResultBadRequest();
+            }
+
+            try
+            {
+                var job = new Job()
+                {
+                    Status = JobStatus.StatusPending,
+                    CreatedDate = DateTime.Now
+                };
+                _jobRepository.Add(job);
+
+                var startGoal = new Goal()
+                {
+                    JobId = job.JobId,
+                    LocationId = jobRequest.Start,
+                    Status = "pending"
+                };
+                var destinationGoal = new Goal()
+                {
+                    JobId = job.JobId,
+                    LocationId = jobRequest.Destination,
+                    Status = "pending"
+                };
+                _goalRepository.Add(startGoal);
+                _goalRepository.Add(destinationGoal);
+                return GetResultCreated();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return GetResultInternalError();
+            }
         }
 
         [HttpPatch("{id}")]
-        public IActionResult UpdateJob(long id, [FromBody] object job)
+        public IActionResult UpdateJob(long id, [FromBody] JobRequest jobRequest)
         {
-            return StatusCode(StatusCodes.Status200OK, job);
+            if (jobRequest.Status == null)
+            {
+                return GetResultBadRequest();
+            }
+
+            var hasField = typeof(JobStatus).GetFields(BindingFlags.Public | BindingFlags.Static)
+                .Select(x => x.GetRawConstantValue().ToString()).Contains(jobRequest.Status);
+
+            if (!hasField)
+            {
+                return GetResultBadRequest();
+            }
+
+            try
+            {
+                var job = _jobRepository.Get(id);
+                var jobUpdated = new Job()
+                {
+                    JobId = job.JobId,
+                    Status = jobRequest.Status,
+                    CreatedDate = job.CreatedDate,
+                    UpdatedDate = DateTime.Now
+                };
+                _jobRepository.Update(job, jobUpdated);
+                return GetResultSuccess();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return GetResultInternalError();
+            }
         }
     }
 }
