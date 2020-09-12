@@ -1,5 +1,3 @@
-using System;
-
 namespace AssistiveRobot.Web.Service.Models.Request
 {
     public class JobRequest
