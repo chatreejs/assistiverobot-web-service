@@ -4,6 +4,10 @@ go
 
 use AssistiveRobot
 
+drop table if exists Goal
+drop table if exists Location
+drop table if exists Job
+
 create table Job
 (
     JobId       bigint identity (1, 1) not null,
