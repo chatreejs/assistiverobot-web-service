@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AssistiveRobot.Web.Service.Domains;
+using AssistiveRobot.Web.Service.Middlewares;
 using AssistiveRobot.Web.Service.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -38,7 +39,6 @@ namespace AssistiveRobot.Web.Service
                     Configuration.GetSection("WebServiceSettings:CorsPolicy").GetChildren().ToList().ForEach(corsPolicy =>
                     {
                         builder
-                            //.AllowAnyOrigin()
                             .WithOrigins(corsPolicy.Value)
                             .AllowAnyHeader()
                             .AllowAnyMethod()
@@ -73,6 +73,8 @@ namespace AssistiveRobot.Web.Service
             }
 
             //app.UseHttpsRedirection();
+
+            app.UseOptions();
 
             app.UseRouting();
 
