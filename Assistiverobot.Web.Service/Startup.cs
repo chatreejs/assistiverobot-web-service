@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AssistiveRobot.Web.Service.Domains;
 using AssistiveRobot.Web.Service.Middlewares;
 using AssistiveRobot.Web.Service.Repositories;
+using AssistiveRobot.Web.Service.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -51,6 +52,8 @@ namespace AssistiveRobot.Web.Service
             services.AddScoped<JobRepository>();
             services.AddScoped<GoalRepository>();
             services.AddScoped<LocationRepository>();
+
+            services.AddScoped<JobService>();
 
             services.AddControllers()
                 .AddNewtonsoftJson(
