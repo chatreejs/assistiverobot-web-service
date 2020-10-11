@@ -26,7 +26,7 @@ pipeline {
                   bat 'appcmd stop apppool /apppool.name:\"Toktak Web Service Dev\"'
                   bat label: '', script: '''cd ./AssistiveRobot.Web.Service
                                          dotnet restore
-                                         dotnet publish --configuration Release --output D:\\Toktak-Web-Service\\production'''
+                                         dotnet publish --configuration Release --output D:\\Toktak-Web-Service\\develop'''
                   bat 'appcmd start apppool /apppool.name:\"Toktak Web Service Dev\"'
               }
           }
