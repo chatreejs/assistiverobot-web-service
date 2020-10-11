@@ -1,10 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using Assistiverobot.Web.Service.Models.Request;
-using AssistiveRobot.Web.Service.Domains;
-using AssistiveRobot.Web.Service.Models.Response;
-using AssistiveRobot.Web.Service.Repositories;
+using AssistiveRobot.Web.Service.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,11 +10,11 @@ namespace AssistiveRobot.Web.Service.Controllers
     [Route("api/v1/locations")]
     public class LocationController : BaseController
     {
-        private readonly LocationRepository _locationRepository;
+        private readonly LocationService _locationService;
 
-        public LocationController(LocationRepository locationRepository)
+        public LocationController(LocationService locationService)
         {
-            _locationRepository = locationRepository;
+            _locationService = locationService;
         }
 
         [HttpGet]
@@ -26,20 +22,29 @@ namespace AssistiveRobot.Web.Service.Controllers
         {
             try
             {
-                var locations = _locationRepository.GetAll();
-                if (!locations.Any())
+                var locationResponse = _locationService.GetAllLocation();
+                if (locationResponse == null)
                 {
                     return GetResultSuccess(null, StatusCodes.Status204NoContent);
                 }
+                return GetResultSuccess(locationResponse);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return GetResultInternalError();
+            }
+        }
 
-                var locationResponse = new List<LocationResponse>();
-                foreach (var location in locations)
+        [HttpGet("{id}")]
+        public IActionResult GetLocationById(long id)
+        {
+            try
+            {
+                var locationResponse = _locationService.GetLocationById(id);
+                if (locationResponse == null)
                 {
-                    locationResponse.Add(new LocationResponse()
-                    {
-                        LocationId = location.LocationId,
-                        Name = location.Name
-                    });
+                    return GetResultSuccess(null, StatusCodes.Status204NoContent);
                 }
                 return GetResultSuccess(locationResponse);
             }
@@ -60,19 +65,8 @@ namespace AssistiveRobot.Web.Service.Controllers
 
             try
             {
-                var location = new Location()
-                {
-                    Name = locationRequest.Name,
-                    PositionX = locationRequest.Position.X,
-                    PositionY = locationRequest.Position.Y,
-                    PositionZ = locationRequest.Position.Z,
-                    OrientationX = locationRequest.Orientation.X,
-                    OrientationY = locationRequest.Orientation.Y,
-                    OrientationZ = locationRequest.Orientation.Z,
-                    OrientationW = locationRequest.Orientation.W
-                };
-                _locationRepository.Add(location);
-            return GetResultCreated();
+                _locationService.CreateLocation(locationRequest);
+                return GetResultCreated();
             }
             catch (Exception e)
             {
@@ -81,10 +75,19 @@ namespace AssistiveRobot.Web.Service.Controllers
             }
         }
 
-        [HttpPatch]
-        public IActionResult UpdateLocation()
+        [HttpPatch("{id}")]
+        public IActionResult UpdateLocation(long id, [FromBody] LocationRequest locationRequest)
         {
-            return GetResultSuccess();
+            try
+            {
+                _locationService.UpdateLocation(id, locationRequest);
+                return GetResultSuccess();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return GetResultInternalError();
+            }
         }
     }
 }

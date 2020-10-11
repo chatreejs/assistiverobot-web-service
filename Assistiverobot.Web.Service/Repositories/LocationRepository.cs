@@ -20,7 +20,10 @@ namespace AssistiveRobot.Web.Service.Repositories
 
         public Location Get(long id)
         {
-            throw new System.NotImplementedException();
+            var location = _context.Location
+                .SingleOrDefault(l => l.LocationId == id);
+
+            return location;
         }
 
         public void Add(Location entity)
@@ -31,7 +34,19 @@ namespace AssistiveRobot.Web.Service.Repositories
 
         public void Update(Location entityToUpdate, Location entity)
         {
-            throw new System.NotImplementedException();
+            entityToUpdate = _context.Location
+            .Single(l => l.LocationId == entityToUpdate.LocationId);
+
+            entityToUpdate.Name = entity.Name;
+            entityToUpdate.PositionX = entity.PositionX;
+            entityToUpdate.PositionY = entity.PositionY;
+            entityToUpdate.PositionZ = entity.PositionZ;
+            entityToUpdate.OrientationX = entity.OrientationX;
+            entityToUpdate.OrientationY = entity.OrientationY;
+            entityToUpdate.OrientationZ = entity.OrientationZ;
+            entityToUpdate.OrientationW = entity.OrientationW;
+
+            _context.SaveChanges();
         }
 
         public void Delete(Location entity)

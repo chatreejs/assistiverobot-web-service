@@ -54,6 +54,8 @@ namespace AssistiveRobot.Web.Service
             services.AddScoped<LocationRepository>();
 
             services.AddScoped<JobService>();
+            services.AddScoped<GoalService>();
+            services.AddScoped<LocationService>();
 
             services.AddControllers()
                 .AddNewtonsoftJson(

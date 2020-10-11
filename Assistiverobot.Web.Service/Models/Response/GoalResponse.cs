@@ -1,5 +1,3 @@
-using AssistiveRobot.Web.Service.Models.Request;
-
 namespace AssistiveRobot.Web.Service.Models.Response
 {
     public class GoalResponse

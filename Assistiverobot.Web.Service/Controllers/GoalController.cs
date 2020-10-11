@@ -2,9 +2,8 @@ using System;
 using System.Linq;
 using System.Reflection;
 using Assistiverobot.Web.Service.Constants;
-using AssistiveRobot.Web.Service.Domains;
 using AssistiveRobot.Web.Service.Models.Request;
-using AssistiveRobot.Web.Service.Repositories;
+using AssistiveRobot.Web.Service.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AssistiveRobot.Web.Service.Controllers
@@ -13,11 +12,11 @@ namespace AssistiveRobot.Web.Service.Controllers
     [Route("api/v1/goals")]
     public class GoalController : BaseController
     {
-        private readonly GoalRepository _goalRepository;
+        private readonly GoalService _goalService;
 
-        public GoalController(GoalRepository goalRepository)
+        public GoalController(GoalService goalService)
         {
-            _goalRepository = goalRepository;
+            _goalService = goalService;
         }
 
         [HttpPatch("{id}")]
@@ -38,15 +37,7 @@ namespace AssistiveRobot.Web.Service.Controllers
 
             try
             {
-                var goal = _goalRepository.Get(id);
-                var goalUpdated = new Goal()
-                {
-                    GoalId = goal.GoalId,
-                    JobId = goal.JobId,
-                    LocationId = goal.LocationId,
-                    Status = goalRequest.Status,
-                };
-                _goalRepository.Update(goal, goalUpdated);
+                _goalService.UpdateGoal(id, goalRequest);
                 return GetResultSuccess();
             }
             catch (Exception e)
