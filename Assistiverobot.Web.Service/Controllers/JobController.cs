@@ -1,13 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using AssistiveRobot.Web.Service.Constants;
-using AssistiveRobot.Web.Service.Domains;
 using AssistiveRobot.Web.Service.Models.Params;
 using AssistiveRobot.Web.Service.Models.Request;
-using AssistiveRobot.Web.Service.Models.Response;
-using AssistiveRobot.Web.Service.Repositories;
+using AssistiveRobot.Web.Service.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,13 +14,11 @@ namespace AssistiveRobot.Web.Service.Controllers
     [Route("api/v1/jobs")]
     public class JobController : BaseController
     {
-        private readonly JobRepository _jobRepository;
-        private readonly GoalRepository _goalRepository;
+        private readonly JobService _jobService;
 
-        public JobController(JobRepository jobRepository, GoalRepository goalRepository)
+        public JobController(JobService jobService)
         {
-            _jobRepository = jobRepository;
-            _goalRepository = goalRepository;
+            _jobService = jobService;
         }
 
         [HttpGet]
@@ -31,50 +26,11 @@ namespace AssistiveRobot.Web.Service.Controllers
         {
             try
             {
-                var jobs = _jobRepository.GetAllByCondition(jobFilter);
-                if (!jobs.Any())
+                var jobResponse = _jobService.GetAllJob(jobFilter);
+                if (jobResponse == null)
                 {
                     return GetResultSuccess(null, StatusCodes.Status204NoContent);
                 }
-
-                var jobResponse = new List<JobResponse>();
-                foreach (var job in jobs)
-                {
-                    var goalResponse = new List<GoalResponse>();
-                    foreach (var goal in job.Goal)
-                    {
-                        var position = new Position()
-                        {
-                            X = goal.Location.PositionX,
-                            Y = goal.Location.PositionY,
-                            Z = goal.Location.PositionZ,
-                        };
-                        var orientation = new Orientation()
-                        {
-                            X = goal.Location.OrientationX,
-                            Y = goal.Location.OrientationY,
-                            Z = goal.Location.OrientationZ,
-                            W = goal.Location.OrientationW,
-                        };
-                        goalResponse.Add(new GoalResponse()
-                        {
-                            GoalId = goal.GoalId,
-                            Position = position,
-                            Orientation = orientation,
-                            Status = goal.Status
-                        });
-                    }
-
-                    jobResponse.Add(new JobResponse()
-                    {
-                        JobId = job.JobId,
-                        Goal = goalResponse,
-                        Status = job.Status,
-                        CreatedDate = job.CreatedDate,
-                        UpdatedDate = job.UpdatedDate
-                    });
-                }
-
                 return GetResultSuccess(jobResponse);
             }
             catch (Exception e)
@@ -89,45 +45,11 @@ namespace AssistiveRobot.Web.Service.Controllers
         {
             try
             {
-                var job = _jobRepository.Get(id);
-                if (job == null)
+                var jobResponse = _jobService.GetJobById(id);
+                if (jobResponse == null)
                 {
                     return GetResultNotFound();
                 }
-
-                var goalResponse = new List<GoalResponse>();
-                foreach (var goal in job.Goal)
-                {
-                    var position = new Position()
-                    {
-                        X = goal.Location.PositionX,
-                        Y = goal.Location.PositionY,
-                        Z = goal.Location.PositionZ,
-                    };
-                    var orientation = new Orientation()
-                    {
-                        X = goal.Location.OrientationX,
-                        Y = goal.Location.OrientationY,
-                        Z = goal.Location.OrientationZ,
-                        W = goal.Location.OrientationW,
-                    };
-                    goalResponse.Add(new GoalResponse()
-                    {
-                        GoalId = goal.GoalId,
-                        Position = position,
-                        Orientation = orientation,
-                        Status = goal.Status
-                    });
-                }
-
-                var jobResponse = new JobResponse()
-                {
-                    JobId = job.JobId,
-                    Goal = goalResponse,
-                    Status = job.Status,
-                    CreatedDate = job.CreatedDate,
-                    UpdatedDate = job.UpdatedDate
-                };
                 return GetResultSuccess(jobResponse);
             }
             catch (Exception e)
@@ -138,36 +60,16 @@ namespace AssistiveRobot.Web.Service.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateJob([FromBody] JobLocationRequest jobRequest)
+        public IActionResult CreateJob([FromBody] JobLocationRequest jobLocationRequest)
         {
-            if (jobRequest.Start == 0 || jobRequest.Destination == 0)
+            if (jobLocationRequest.Start == 0 || jobLocationRequest.Destination == 0)
             {
                 return GetResultBadRequest();
             }
 
             try
             {
-                var job = new Job()
-                {
-                    Status = JobStatus.StatusPending,
-                    CreatedDate = DateTime.Now
-                };
-                _jobRepository.Add(job);
-
-                var startGoal = new Goal()
-                {
-                    JobId = job.JobId,
-                    LocationId = jobRequest.Start,
-                    Status = "pending"
-                };
-                var destinationGoal = new Goal()
-                {
-                    JobId = job.JobId,
-                    LocationId = jobRequest.Destination,
-                    Status = "pending"
-                };
-                _goalRepository.Add(startGoal);
-                _goalRepository.Add(destinationGoal);
+                _jobService.CreateJob(jobLocationRequest);
                 return GetResultCreated();
             }
             catch (Exception e)
@@ -195,15 +97,7 @@ namespace AssistiveRobot.Web.Service.Controllers
 
             try
             {
-                var job = _jobRepository.Get(id);
-                var jobUpdated = new Job()
-                {
-                    JobId = job.JobId,
-                    Status = jobRequest.Status,
-                    CreatedDate = job.CreatedDate,
-                    UpdatedDate = DateTime.Now
-                };
-                _jobRepository.Update(job, jobUpdated);
+                _jobService.UpdateJob(id, jobRequest);
                 return GetResultSuccess();
             }
             catch (Exception e)
