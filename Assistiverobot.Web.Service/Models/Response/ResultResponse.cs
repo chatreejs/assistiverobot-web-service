@@ -4,5 +4,6 @@ namespace AssistiveRobot.Web.Service.Models.Response
     {
         public string Message { get; set; }
         public object Result { get; set; }
+        public bool Success { get; set; }
     }
 }
