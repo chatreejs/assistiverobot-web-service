@@ -1,16 +1,21 @@
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
 using AssistiveRobot.Web.Service.Controllers;
 using AssistiveRobot.Web.Service.Core;
 using AssistiveRobot.Web.Service.Domains;
 using AssistiveRobot.Web.Service.Extensions;
+using AssistiveRobot.Web.Service.Models.OAuth;
 using AssistiveRobot.Web.Service.Models.Response;
 using AssistiveRobot.Web.Service.Repositories;
 using AssistiveRobot.Web.Service.Request;
 using AssistiveRobot.Web.Service.Response;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -21,12 +26,28 @@ namespace AssistiveRobot.Web.Service.Services
     {
         private readonly IUserTokenRepository _userTokenRepository;
         private readonly UserRepository _userRepository;
+        private readonly IWebHostEnvironment _hostingEnvironment;
         private readonly AppSettings _appSettings;
-        public AuthenService(IUserTokenRepository userTokenRepository, UserRepository userRepository, IOptions<AppSettings> appSettings)
+        public AuthenService(IUserTokenRepository userTokenRepository,
+                            UserRepository userRepository,
+                            IWebHostEnvironment hostingEnvironment,
+                            IOptions<AppSettings> appSettings)
         {
             _userTokenRepository = userTokenRepository;
             _userRepository = userRepository;
+            _hostingEnvironment = hostingEnvironment;
             _appSettings = appSettings.Value;
+        }
+
+        public async Task<OpenidConfiguration> WellKnow()
+        {
+            string filePath = _hostingEnvironment.ContentRootPath;
+            filePath = Path.Join(filePath, "Config", "openid-configuration.json");
+
+            string json = await System.IO.File.ReadAllTextAsync(filePath);
+            json = json.Replace("{issuer_endpoint}", $"{_appSettings.OAuth.Issuer}/api/v1/authen");
+
+            return JsonSerializer.Deserialize<OpenidConfiguration>(json);
         }
 
         public IActionResult Login(BaseController baseController, LoginRequest model)
