@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using AssistiveRobot.Web.Service.Core;
 using AssistiveRobot.Web.Service.Domains;
 using AssistiveRobot.Web.Service.Middlewares;
@@ -11,13 +9,10 @@ using AssistiveRobot.Web.Service.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
 
@@ -71,17 +66,17 @@ namespace AssistiveRobot.Web.Service
                 Configuration["WebServiceSettings:Database"]));
 
             // Register services
-            services.AddScoped<GoalRepository>();
-            services.AddScoped<JobRepository>();
-            services.AddScoped<LocationRepository>();
-            services.AddScoped<UserRepository>();
+            services.AddScoped<IJobRepository, JobRepository>();
+            services.AddScoped<IGoalRepository, GoalRepository>();
+            services.AddScoped<ILocationRepository, LocationRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
             services.AddSingleton<IUserTokenRepository, UserTokenInMemoryRepository>();
 
             // Register services
-            services.AddScoped<GoalService>();
-            services.AddScoped<JobService>();
-            services.AddScoped<LocationService>();
-            services.AddScoped<UserService>();
+            services.AddScoped<IJobService, JobService>();
+            services.AddScoped<IGoalService, GoalService>();
+            services.AddScoped<ILocationService, LocationService>();
+            services.AddScoped<IUserService, UserService>();
             services.AddTransient<IAuthenService, AuthenService>();
 
             services.AddAuthentication(options =>

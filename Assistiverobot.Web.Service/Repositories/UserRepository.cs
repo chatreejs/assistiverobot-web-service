@@ -4,7 +4,7 @@ using AssistiveRobot.Web.Service.Domains;
 
 namespace AssistiveRobot.Web.Service.Repositories
 {
-    public class UserRepository : IRepository<User>
+    public class UserRepository : IUserRepository
     {
         private readonly AssistiveRobotContext _context;
 
@@ -15,7 +15,8 @@ namespace AssistiveRobot.Web.Service.Repositories
 
         public IEnumerable<User> GetAll()
         {
-            throw new System.NotImplementedException();
+            return _context.User
+                .ToList();
         }
 
         public User Get(string username, string password)

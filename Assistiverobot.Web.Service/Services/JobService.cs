@@ -10,15 +10,19 @@ using AssistiveRobot.Web.Service.Repositories;
 
 namespace AssistiveRobot.Web.Service.Services
 {
-    public class JobService
+    public class JobService : IJobService
     {
-        private readonly JobRepository _jobRepository;
-        private readonly GoalRepository _goalRepository;
+        private readonly IJobRepository _jobRepository;
+        private readonly IGoalRepository _goalRepository;
+        private readonly ILocationRepository _locationRepository;
 
-        public JobService(JobRepository jobRepository, GoalRepository goalRepository)
+        public JobService(IJobRepository jobRepository,
+                        IGoalRepository goalRepository,
+                        ILocationRepository locationRepository)
         {
             _jobRepository = jobRepository;
             _goalRepository = goalRepository;
+            _locationRepository = locationRepository;
         }
 
         public List<JobResponse> GetAllJob(JobFilter jobFilter)
@@ -132,6 +136,13 @@ namespace AssistiveRobot.Web.Service.Services
         {
             try
             {
+                var locationStart = _locationRepository.Get(jobLocationRequest.Start);
+                var locationDestination = _locationRepository.Get(jobLocationRequest.Destination);
+                if (locationStart == null || locationDestination == null)
+                {
+                    throw new Exception("No location found");
+                }
+
                 var job = new Job()
                 {
                     Status = JobStatus.StatusPending,
@@ -150,7 +161,8 @@ namespace AssistiveRobot.Web.Service.Services
                     JobId = job.JobId,
                     LocationId = jobLocationRequest.Destination,
                     Status = "pending"
-                };
+                };               
+
                 _goalRepository.Add(startGoal);
                 _goalRepository.Add(destinationGoal);
             }

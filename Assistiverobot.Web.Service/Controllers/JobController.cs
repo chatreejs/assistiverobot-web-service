@@ -4,7 +4,7 @@ using System.Reflection;
 using AssistiveRobot.Web.Service.Constants;
 using AssistiveRobot.Web.Service.Models.Params;
 using AssistiveRobot.Web.Service.Models.Request;
-using AssistiveRobot.Web.Service.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,9 +14,9 @@ namespace AssistiveRobot.Web.Service.Controllers
     [Route("api/v1/jobs")]
     public class JobController : BaseController
     {
-        private readonly JobService _jobService;
+        private readonly IJobService _jobService;
 
-        public JobController(JobService jobService)
+        public JobController(IJobService jobService)
         {
             _jobService = jobService;
         }
@@ -97,6 +97,11 @@ namespace AssistiveRobot.Web.Service.Controllers
 
             try
             {
+                var job = _jobService.GetJobById(id);
+                if (job == null)
+                {
+                    return GetResultNotFound();
+                }
                 _jobService.UpdateJob(id, jobRequest);
                 return GetResultSuccess();
             }

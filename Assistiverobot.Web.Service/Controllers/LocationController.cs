@@ -1,6 +1,8 @@
 using System;
+using AssistiveRobot.Web.Service.Constants;
 using Assistiverobot.Web.Service.Models.Request;
 using AssistiveRobot.Web.Service.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,9 +12,9 @@ namespace AssistiveRobot.Web.Service.Controllers
     [Route("api/v1/locations")]
     public class LocationController : BaseController
     {
-        private readonly LocationService _locationService;
+        private readonly ILocationService _locationService;
 
-        public LocationController(LocationService locationService)
+        public LocationController(ILocationService locationService)
         {
             _locationService = locationService;
         }
@@ -56,6 +58,7 @@ namespace AssistiveRobot.Web.Service.Controllers
         }
 
         [HttpPost]
+        // [Authorize(Roles = Role.Admin)]
         public IActionResult CreateLocation([FromBody] LocationRequest locationRequest)
         {
             if (locationRequest.Name == null || locationRequest.Position == null || locationRequest.Orientation == null)
@@ -76,10 +79,16 @@ namespace AssistiveRobot.Web.Service.Controllers
         }
 
         [HttpPatch("{id}")]
+        // [Authorize(Roles = Role.Admin)]
         public IActionResult UpdateLocation(long id, [FromBody] LocationRequest locationRequest)
         {
             try
             {
+                var location = _locationService.GetLocationById(id);
+                if (location == null)
+                {
+                    return GetResultNotFound();
+                }
                 _locationService.UpdateLocation(id, locationRequest);
                 return GetResultSuccess();
             }

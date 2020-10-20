@@ -25,11 +25,11 @@ namespace AssistiveRobot.Web.Service.Services
     public class AuthenService : IAuthenService
     {
         private readonly IUserTokenRepository _userTokenRepository;
-        private readonly UserRepository _userRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IWebHostEnvironment _hostingEnvironment;
         private readonly AppSettings _appSettings;
         public AuthenService(IUserTokenRepository userTokenRepository,
-                            UserRepository userRepository,
+                            IUserRepository userRepository,
                             IWebHostEnvironment hostingEnvironment,
                             IOptions<AppSettings> appSettings)
         {

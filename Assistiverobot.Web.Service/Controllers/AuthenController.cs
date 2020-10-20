@@ -24,6 +24,11 @@ namespace AssistiveRobot.Web.Service.Controllers
             return await _authenService.WellKnow();
         }
 
+        // public IActionResult Token()
+        // {
+        //     throw 
+        // }
+
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginRequest model)
         {

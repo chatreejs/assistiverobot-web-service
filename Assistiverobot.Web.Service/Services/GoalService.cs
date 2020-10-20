@@ -5,11 +5,11 @@ using AssistiveRobot.Web.Service.Repositories;
 
 namespace AssistiveRobot.Web.Service.Services
 {
-    public class GoalService
+    public class GoalService : IGoalService
     {
-        private readonly GoalRepository _goalRepository;
+        private readonly IGoalRepository _goalRepository;
 
-        public GoalService(GoalRepository goalRepository)
+        public GoalService(IGoalRepository goalRepository)
         {
             _goalRepository = goalRepository;
         }

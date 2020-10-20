@@ -8,11 +8,11 @@ using AssistiveRobot.Web.Service.Repositories;
 
 namespace AssistiveRobot.Web.Service.Services
 {
-    public class LocationService
+    public class LocationService : ILocationService
     {
-        private readonly LocationRepository _locationRepository;
+        private readonly ILocationRepository _locationRepository;
 
-        public LocationService(LocationRepository locationRepository)
+        public LocationService(ILocationRepository locationRepository)
         {
             _locationRepository = locationRepository;
         }

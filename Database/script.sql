@@ -64,9 +64,10 @@ create table Users
 create table UserToken
 (
     UserId bigint identity (1, 1) not null,
-    RefreshToken varchar(max) null,
     Issued datetime null,
     Expires datetime null,
+    RefreshToken varchar(max) null,
+    FcmToken varchar(max) null,
     ClientId varchar(50) null,
     Nonce varchar(max) null,
     CheckSum varchar(max) null

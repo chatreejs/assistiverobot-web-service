@@ -4,7 +4,7 @@ using AssistiveRobot.Web.Service.Domains;
 
 namespace AssistiveRobot.Web.Service.Repositories
 {
-    public class LocationRepository : IRepository<Location>
+    public class LocationRepository : ILocationRepository
     {
         private readonly AssistiveRobotContext _context;
 
