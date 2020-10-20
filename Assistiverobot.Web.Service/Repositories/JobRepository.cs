@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AssistiveRobot.Web.Service.Repositories
 {
-    public class JobRepository : IRepository<Job>
+    public class JobRepository : IJobRepository
     {
         private readonly AssistiveRobotContext _context;
 

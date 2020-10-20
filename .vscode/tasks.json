@@ -4,6 +4,9 @@
         {
             "label": "build",
             "command": "dotnet",
+            "osx": {
+                "command": "/usr/local/share/dotnet/dotnet"
+            },
             "type": "process",
             "args": [
                 "build",

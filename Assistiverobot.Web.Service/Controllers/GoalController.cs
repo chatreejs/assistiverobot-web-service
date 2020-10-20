@@ -12,9 +12,9 @@ namespace AssistiveRobot.Web.Service.Controllers
     [Route("api/v1/goals")]
     public class GoalController : BaseController
     {
-        private readonly GoalService _goalService;
+        private readonly IGoalService _goalService;
 
-        public GoalController(GoalService goalService)
+        public GoalController(IGoalService goalService)
         {
             _goalService = goalService;
         }

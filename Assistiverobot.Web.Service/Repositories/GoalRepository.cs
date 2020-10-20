@@ -4,7 +4,7 @@ using AssistiveRobot.Web.Service.Domains;
 
 namespace AssistiveRobot.Web.Service.Repositories
 {
-    public class GoalRepository : IRepository<Goal>
+    public class GoalRepository : IGoalRepository
     {
         private readonly AssistiveRobotContext _context;
 

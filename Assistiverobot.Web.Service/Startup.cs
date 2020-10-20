@@ -1,20 +1,19 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Text;
+using AssistiveRobot.Web.Service.Core;
 using AssistiveRobot.Web.Service.Domains;
 using AssistiveRobot.Web.Service.Middlewares;
 using AssistiveRobot.Web.Service.Repositories;
 using AssistiveRobot.Web.Service.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
 
 namespace AssistiveRobot.Web.Service
@@ -33,9 +32,9 @@ namespace AssistiveRobot.Web.Service
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCors(options => 
+            services.AddCors(options =>
             {
-                options.AddPolicy(_allowSpecificOrigins, builder => 
+                options.AddPolicy(_allowSpecificOrigins, builder =>
                 {
                     Configuration.GetSection("WebServiceSettings:CorsPolicy").GetChildren().ToList().ForEach(corsPolicy =>
                     {
@@ -47,15 +46,6 @@ namespace AssistiveRobot.Web.Service
                     });
                 });
             });
-            services.AddDbContext<AssistiveRobotContext>(opts => opts.UseSqlServer(
-                Configuration["WebServiceSettings:AssistiveRobotDB"]));
-            services.AddScoped<JobRepository>();
-            services.AddScoped<GoalRepository>();
-            services.AddScoped<LocationRepository>();
-
-            services.AddScoped<JobService>();
-            services.AddScoped<GoalService>();
-            services.AddScoped<LocationService>();
 
             services.AddControllers()
                 .AddNewtonsoftJson(
@@ -67,6 +57,49 @@ namespace AssistiveRobot.Web.Service
                             NamingStrategy = new SnakeCaseNamingStrategy()
                         };
                     });
+
+            // Register services - Application settings
+            services.Configure<AppSettings>(Configuration.GetSection("WebServiceSettings"));
+
+            // Add database context.
+            services.AddDbContext<AssistiveRobotContext>(opts => opts.UseSqlServer(
+                Configuration["WebServiceSettings:Database"]));
+
+            // Register services
+            services.AddScoped<IJobRepository, JobRepository>();
+            services.AddScoped<IGoalRepository, GoalRepository>();
+            services.AddScoped<ILocationRepository, LocationRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddSingleton<IUserTokenRepository, UserTokenInMemoryRepository>();
+
+            // Register services
+            services.AddScoped<IJobService, JobService>();
+            services.AddScoped<IGoalService, GoalService>();
+            services.AddScoped<ILocationService, LocationService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddTransient<IAuthenService, AuthenService>();
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.Audience = Configuration.GetValue<string>("WebServiceSettings:OAuth:Issuer");
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(
+                            Configuration.GetValue<string>("WebServiceSettings:OAuth:SecretKey"))),
+                    ValidateIssuer = false,
+                    ValidateAudience = true,
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -85,6 +118,7 @@ namespace AssistiveRobot.Web.Service
 
             app.UseCors(_allowSpecificOrigins);
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });

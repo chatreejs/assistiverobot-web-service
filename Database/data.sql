@@ -9,3 +9,6 @@ VALUES ('A', -0.7045400, -2.7252000, 0.0000000, 0.0000000, 0.0000000, -0.7023200
 INSERT INTO Goal (JobId, LocationId, Status)
 VALUES (1, 1, 'pending'),
        (1, 2, 'pending');
+
+INSERT INTO Users (FirstName, LastName, Role, Username, Password)
+VALUES ('Administrator', '1', 'Admin', 'admin', '1234')

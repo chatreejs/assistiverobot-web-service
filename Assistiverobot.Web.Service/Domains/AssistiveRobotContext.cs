@@ -18,6 +18,8 @@ namespace AssistiveRobot.Web.Service.Domains
         public virtual DbSet<Goal> Goal { get; set; }
         public virtual DbSet<Job> Job { get; set; }
         public virtual DbSet<Location> Location { get; set; }
+        // public virtual DbSet<UserToken> UserToken { get; set; }
+        public virtual DbSet<User> User { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -74,6 +76,56 @@ namespace AssistiveRobot.Web.Service.Domains
                 entity.Property(e => e.PositionY).HasColumnType("decimal(10, 7)");
 
                 entity.Property(e => e.PositionZ).HasColumnType("decimal(10, 7)");
+            });
+
+            // modelBuilder.Entity<UserToken>(entity =>
+            // {
+            //     entity.HasNoKey();
+
+            //     entity.Property(e => e.CheckSum).IsUnicode(false);
+
+            //     entity.Property(e => e.ClientId)
+            //         .HasMaxLength(50)
+            //         .IsUnicode(false);
+
+            //     entity.Property(e => e.Expires).HasColumnType("datetime");
+
+            //     entity.Property(e => e.Issued).HasColumnType("datetime");
+
+            //     entity.Property(e => e.Nonce).IsUnicode(false);
+
+            //     entity.Property(e => e.RefreshToken).IsUnicode(false);
+
+            //     entity.Property(e => e.UserId).ValueGeneratedOnAdd();
+            // });
+
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.HasKey(e => e.UserId)
+                    .HasName("PK__Users__1788CC4CE8E59729");
+
+                entity.Property(e => e.FirstName)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.LastName)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Role)
+                    .IsRequired()
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Username)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Password)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             OnModelCreatingPartial(modelBuilder);
